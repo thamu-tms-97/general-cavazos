@@ -6,29 +6,34 @@ import org.json.simple.parser.*;
 
 public class JSONFile {
 
-  // read a json file and return an array
-  public static JSONArray readArray(String fileName) {
-    //
-    // read the birthday.json file and iterate over it
-    //
+    /**
+     * Reads a JSON resource and returns it as a String array.
+     * Ideal for Maven projects where the file is in src/main/resources.
+     */
+    public static String[] readCommandsFromResource(String resourceName) {
+        JSONParser jsonParser = new JSONParser();
+        JSONArray data = null;
 
-    // JSON parser object to parse read file
-    JSONParser jsonParser = new JSONParser();
+        try (
+            InputStream inputStream = JSONFile.class.getResourceAsStream(resourceName);
+            InputStreamReader reader = new InputStreamReader(inputStream)
+        ) {
+            if (inputStream == null) {
+                return null;
+            }
 
-    JSONArray data = null;
+            Object obj = jsonParser.parse(reader);
+            data = (JSONArray) obj;
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
 
-    try (FileReader reader = new FileReader(fileName)) {
-      Object obj = jsonParser.parse(reader);
-
-      data = (JSONArray) obj;
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ParseException e) {
-      e.printStackTrace();
+        // Convert JSONArray to a clean String array
+        String[] arr = new String[data.size()];
+        for (int i = 0; i < data.size(); i++) {
+            arr[i] = data.get(i).toString().trim();
+        }
+        return arr;
     }
-
-    return data;
-  }
 }
